@@ -99,7 +99,7 @@ namespace First_Project.Controllers
          .FirstOrDefaultAsync(c => c.Id == id);
             if (country == null)
             {
-                return NotFound();
+                return NotFound("we do not have this country");
             }
             _Context.cities.RemoveRange(country.Cities);
             _Context.Countries.Remove(country);

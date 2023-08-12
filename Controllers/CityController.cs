@@ -84,8 +84,9 @@ namespace First_Project.Controllers
                 {
                     double temperature = await _weatherService.GetTemperatureAsync(b.Name);
                     b.modifiedtime = DateTime.Now;
-                    b.tempData = temperature;
                     string formattedNumber = temperature.ToString("0.00");
+                    double temp = Double.Parse(formattedNumber);
+                    b.tempData = temp;
                     await _Context.SaveChangesAsync();
                     string apiResponse = $"Temperature in {b.Name}:{formattedNumber}°C";
                     string modifyTime = $"Last updated Time is {b.modifiedtime}";
@@ -93,9 +94,8 @@ namespace First_Project.Controllers
                 }
                 else
                 {
-                    string formattedNumber = b.tempData.ToString("0.00");
                     string modifyTime = $"Last updated Time is {b.modifiedtime}";
-                    string apiResponse = $"Temperature in {b.Name}:{formattedNumber}°C";
+                    string apiResponse = $"Temperature in {b.Name}:{b.tempData}°C";
                     return Ok(apiResponse + ".\n" + modifyTime);
                 }
             }
@@ -130,7 +130,9 @@ namespace First_Project.Controllers
             try
             {
                 double temperature = await _weatherService.GetTemperatureAsync(city.Name);
-                city.tempData = temperature;
+                string formattedNumber = temperature.ToString("0.00");
+                double temp = Double.Parse(formattedNumber);
+                city.tempData = temp;
             }
             catch (HttpRequestException ex)
             {
@@ -170,17 +172,22 @@ namespace First_Project.Controllers
             var city = await _Context.cities
         .Include(c => c.country) 
         .FirstOrDefaultAsync(c => c.Id == id);
-            if (city == null)
+            try
             {
-                return NotFound();
+                string na = city.Name;
+               
+                if (city.country != null)
+                {
+                    city.country.Cities.Remove(city);
+                }
+                _Context.cities.Remove(city);
+                await _Context.SaveChangesAsync();
+                return NoContent();
             }
-            if (city.country != null)
+            catch(Exception e)
             {
-                city.country.Cities.Remove(city);
+                return BadRequest("we do not have this city");
             }
-            _Context.cities.Remove(city);
-            await _Context.SaveChangesAsync();
-            return NoContent();
         }
     }
 }
