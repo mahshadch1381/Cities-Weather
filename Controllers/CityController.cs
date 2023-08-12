@@ -22,8 +22,8 @@ namespace First_Project.Controllers
             _Context = context;
             _weatherService = weatherService;                         
         }
-        [HttpGet]
-        public async Task<ActionResult<List<City>>> Get()
+        [HttpGet("GetAllCities")]
+        public async Task<ActionResult<List<City>>> GetAllCities()
         {
             var cities = await _Context.cities
             .Select(c => new CityDto
@@ -51,31 +51,23 @@ namespace First_Project.Controllers
 
                 if (timeDifference.TotalMinutes >= 30)
                 {
-                    double temperature = await _weatherService.GetTemperatureAsync(b.Name);
-                    b.modifiedtime= DateTime.Now;
-                    b.tempData = temperature;
-                    await _Context.SaveChangesAsync();
-                    string apiResponse = $"Temperature in {b.Name}: {temperature} °C";
-                    return Ok(apiResponse);
+                    ....
                 }
                 else
                 {
-                    string apiResponse = $"Temperature in {b.Name}: {b.tempData} °C";
+                    ...
                     return Ok(apiResponse);
                 }
                 
             }
             catch (HttpRequestException ex)
             {
-                if (ex.InnerException != null)
-                {
-                    var innerException = ex.InnerException;
-                }
+                ..
                 return StatusCode(500, $"Error fetching weather data: {ex.Message}");
             }
         }*/
 
-        [HttpGet("{cityname}")]
+        [HttpGet("GetTempOfCity")]
         public async Task<ActionResult<City>> Get(string cityname)
         {
             try
@@ -93,14 +85,18 @@ namespace First_Project.Controllers
                     double temperature = await _weatherService.GetTemperatureAsync(b.Name);
                     b.modifiedtime = DateTime.Now;
                     b.tempData = temperature;
+                    string formattedNumber = temperature.ToString("0.00");
                     await _Context.SaveChangesAsync();
-                    string apiResponse = $"Temperature in {b.Name}: {temperature} °C";
-                    return Ok("there it is updated :" + apiResponse);
+                    string apiResponse = $"Temperature in {b.Name}:{formattedNumber}°C";
+                    string modifyTime = $"Last updated Time is {b.modifiedtime}";
+                    return Ok("there it is updated :" + apiResponse + ".\n" + modifyTime);
                 }
                 else
                 {
-                    string apiResponse = $"Temperature in {b.Name}: {b.tempData} °C";
-                    return Ok(apiResponse);
+                    string formattedNumber = b.tempData.ToString("0.00");
+                    string modifyTime = $"Last updated Time is {b.modifiedtime}";
+                    string apiResponse = $"Temperature in {b.Name}:{formattedNumber}°C";
+                    return Ok(apiResponse + ".\n" + modifyTime);
                 }
             }
             catch (HttpRequestException ex)
@@ -110,10 +106,9 @@ namespace First_Project.Controllers
                     var innerException = ex.InnerException;
                 }
                 return StatusCode(500, $"Error fetching weather data: {ex.Message}");  
-            }
-            
+            }  
         }
-        [HttpPost]
+        [HttpPost("PostCity")]
         public async Task<ActionResult<List<City>>> Post(InputCity incity)
         {
             var country = await _Context.Countries.FirstOrDefaultAsync(c => c.Name == incity.country_Name);
@@ -169,7 +164,7 @@ namespace First_Project.Controllers
             string jsonString = JsonSerializer.Serialize(cities, options);
             return Ok(jsonString);
         }
-        [HttpDelete("{id}")]
+        [HttpDelete("DeleteCity")]
         public async Task<ActionResult<List<City>>> Delete(int id)
         {
             var city = await _Context.cities

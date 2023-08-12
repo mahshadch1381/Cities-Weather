@@ -19,19 +19,10 @@ namespace First_Project.Controllers
         {
             _Context = context;
         }
-        [HttpGet]
+        [HttpGet("GetAllCountries")]
         public async Task<ActionResult<List<CountryDto>>> Get()
         {
-            /*var countries = await _Context.Countries
-           .Include(c => c.Cities) 
-           .ToListAsync();
-              var options = new JsonSerializerOptions
-              {
-                  ReferenceHandler = ReferenceHandler.Preserve,
-              };
-              var jsonString = JsonSerializer.Serialize(countries, options);
-              return Ok(jsonString);*/
-
+           
               var countryDto = await _Context.Countries
               .Select(c => new CountryDto
               {
@@ -51,7 +42,7 @@ namespace First_Project.Controllers
                 return NotFound();
             }
         }
-        [HttpGet("{id}")]
+        [HttpGet("GetCountry")]
         public async Task<ActionResult<CountryDto>> Get(int id)
         {
             var countryDto = await _Context.Countries
@@ -74,7 +65,7 @@ namespace First_Project.Controllers
                 return NotFound();
             }
         }
-         [HttpPost]
+         [HttpPost("PostCountry")]
           public async Task<ActionResult<List<Country>>> Post(Country country)
             {
             var makingCountry = await _Context.Countries.FirstOrDefaultAsync(c => c.Name == country.Name);
@@ -100,7 +91,7 @@ namespace First_Project.Controllers
                 return Ok(jsonString);
             }
        
-        [HttpDelete("{id}")]
+        [HttpDelete("DeleteCountry")]
         public async Task<ActionResult<List<Country>>> Delete(int id)
         {
             var country = await _Context.Countries
