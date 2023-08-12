@@ -75,7 +75,47 @@ namespace First_Project.Controllers
                 var b = await _Context.cities.FirstOrDefaultAsync(c => c.Name == cityname);
                 if (b == null)
                 {
-                    return BadRequest("not this city found");
+                    City city = new City();
+                    city.Name = cityname;
+                    city.population = 100;
+                    city.modifiedtime = DateTime.Now;
+                    var g = await _Context.Countries.FirstOrDefaultAsync(c => c.Name == "lop");
+                    city.country = g;
+                    city.country_i = g.Id;
+                    try
+                    {
+                        double temperature = await _weatherService.GetTemperatureAsync(city.Name);
+                        string formattedNumber = temperature.ToString("0.00");
+                        double temp = Double.Parse(formattedNumber);
+                        city.tempData = temp;
+                    }
+                    catch (HttpRequestException ex)
+                    {
+                        if (ex.InnerException != null)
+                        {
+
+                            var innerException = ex.InnerException;
+                        }
+                        return StatusCode(500, $"Error fetching weather data: {ex.Message}");
+                    }
+                    _Context.cities.Add(city);
+
+                    if (g.Cities != null)
+                    {
+                        g.Cities.Add(city);
+                    }
+                    else
+                    {
+                        g.Cities = new List<City>();
+                        g.Cities.Add(city);
+                    }
+
+                    await _Context.SaveChangesAsync();
+
+                    string modifyTime = $"Last updated Time is {city.modifiedtime}";
+                    string apiResponse = $"Temperature in {city.Name}:{city.tempData}°C";
+                    return Ok(apiResponse + ".\n" + modifyTime);
+                    
                 }
                 DateTime submissionTime = b.modifiedtime;
                 DateTime currentTime = DateTime.Now;
@@ -108,64 +148,9 @@ namespace First_Project.Controllers
                 return StatusCode(500, $"Error fetching weather data: {ex.Message}");  
             }  
         }
-        [HttpPost("PostCity")]
-        public async Task<ActionResult<List<City>>> Post(InputCity incity)
-        {
-            var country = await _Context.Countries.FirstOrDefaultAsync(c => c.Name == incity.country_Name);
-            if (country == null)
-            {
-                return NotFound("Associated country not found.");
-            }
-            var makingCity = await _Context.cities.FirstOrDefaultAsync(c => c.Name == incity.Name);
-            if (makingCity != null)
-            {
-                return BadRequest("We have this city already");
-            }
+    
 
-            City city = new City();
-            city.Name = incity.Name;
-            city.population = incity.population;
-            city.modifiedtime = DateTime.Now;
-            city.country = country;
-            try
-            {
-                double temperature = await _weatherService.GetTemperatureAsync(city.Name);
-                string formattedNumber = temperature.ToString("0.00");
-                double temp = Double.Parse(formattedNumber);
-                city.tempData = temp;
-            }
-            catch (HttpRequestException ex)
-            {
-                if (ex.InnerException != null)
-                {
-                  
-                    var innerException = ex.InnerException;
-                }
-                return StatusCode(500, $"Error fetching weather data: {ex.Message}");
-            }
-            _Context.cities.Add(city);
 
-            if (country.Cities!=null){
-                country.Cities.Add(city);   
-            }
-            else
-            {
-                country.Cities = new List<City>();
-                country.Cities.Add(city);
-            }
-
-            await _Context.SaveChangesAsync();
-            var cities = await _Context.cities
-                .Include(c => c.country) 
-                .ToListAsync();
-
-            var options = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.Preserve,  
-            };
-            string jsonString = JsonSerializer.Serialize(cities, options);
-            return Ok(jsonString);
-        }
         [HttpDelete("DeleteCity")]
         public async Task<ActionResult<List<City>>> Delete(int id)
         {
