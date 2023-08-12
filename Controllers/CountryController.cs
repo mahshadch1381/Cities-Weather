@@ -77,7 +77,12 @@ namespace First_Project.Controllers
          [HttpPost]
           public async Task<ActionResult<List<Country>>> Post(Country country)
             {
-              if (country.Cities != null && country.Cities.Any())
+            var makingCountry = await _Context.Countries.FirstOrDefaultAsync(c => c.Name == country.Name);
+            if (makingCountry != null)
+            {
+                return BadRequest("We have this country already");
+            }
+            if (country.Cities != null && country.Cities.Any())
                 {
                     foreach (var city in country.Cities)
                     {

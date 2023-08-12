@@ -16,17 +16,15 @@
         private readonly HttpClient _httpClient;
         private readonly string _apiKey;
 
-        public WeatherService(HttpClient httpClient, IConfiguration configuration)
+        public WeatherService(HttpClient httpClient, IConfiguration configuration)      
         {
             _httpClient = httpClient;
             _httpClient.BaseAddress = new Uri("https://api.openweathermap.org/data/2.5/");
             _apiKey = "3bd430ec23ca470e35dc0b05c1f50b47";
         }
-
         public async Task<double> GetTemperatureAsync(string city)
         {
             string apiUrl = $"http://api.openweathermap.org/data/2.5/weather?q={Uri.EscapeDataString(city)}&APPID={_apiKey}";
-
             try
             {
                 HttpResponseMessage response = await _httpClient.GetAsync(apiUrl);
@@ -36,8 +34,7 @@
                     WeatherData weatherData = JsonSerializer.Deserialize<WeatherData>(json);
                     if (weatherData != null)
                     {
-                        double temperatureCelsius = weatherData.main.temp - 273.15;
-
+                        double temperatureCelsius = weatherData.main.temp - 273.15;     
                         return temperatureCelsius;
                     }
                     else

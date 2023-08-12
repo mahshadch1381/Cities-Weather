@@ -121,6 +121,12 @@ namespace First_Project.Controllers
             {
                 return NotFound("Associated country not found.");
             }
+            var makingCity = await _Context.cities.FirstOrDefaultAsync(c => c.Name == incity.Name);
+            if (makingCity != null)
+            {
+                return BadRequest("We have this city already");
+            }
+
             City city = new City();
             city.Name = incity.Name;
             city.population = incity.population;
