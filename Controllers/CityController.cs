@@ -1,5 +1,6 @@
 ﻿using First_Project.Data;
 using First_Project.DTO;
+using First_Project.First_Project;
 using First_Project.Models;
 using Microsoft.AspNetCore.Mvc;
 //using System.Data.Entity;
@@ -16,11 +17,19 @@ namespace First_Project.Controllers
     public class CityController : ControllerBase
     {
         private readonly IWeatherService _weatherService;
+        private readonly IInformationService _informationService;
         private readonly DataContext _Context;
-        public CityController(DataContext context, IWeatherService weatherService)
+        private readonly ICityPopulationService _icitypopulation;
+        private readonly IAreaService _areaservice;
+
+        public CityController(DataContext context, IWeatherService weatherService, IInformationService informationService ,
+            ICityPopulationService cityPopulation , IAreaService areaService)   
         {
             _Context = context;
-            _weatherService = weatherService;                         
+            _weatherService = weatherService;
+            _informationService = informationService;
+            _icitypopulation = cityPopulation;
+            _areaservice = areaService; 
         }
         [HttpGet("GetAllCities")]
         public async Task<ActionResult<List<City>>> GetAllCities()
@@ -31,10 +40,13 @@ namespace First_Project.Controllers
                 Id = c.Id,
                 Name = c.Name,
                 population = c.population,
-                country = c.country.Name,
+                country = c.country_name,
                 country_i = c.country_i,
                 modifiedtime = c.modifiedtime,
-                tempData = c.tempData
+                tempData = c.tempData,
+                Longitude = c.Longitude,
+                Latitude = c.Latitude,
+                CompeleteName = c.CompeleteName
             })
               .ToListAsync();
             return Ok(cities);
@@ -70,18 +82,14 @@ namespace First_Project.Controllers
         [HttpGet("GetTempOfCity")]
         public async Task<ActionResult<City>> Get(string cityname)
         {
-            try
+          try
             {
                 var b = await _Context.cities.FirstOrDefaultAsync(c => c.Name == cityname);
                 if (b == null)
                 {
                     City city = new City();
                     city.Name = cityname;
-                    city.population = 100;
                     city.modifiedtime = DateTime.Now;
-                    var g = await _Context.Countries.FirstOrDefaultAsync(c => c.Name == "lop");
-                    city.country = g;
-                    city.country_i = g.Id;
                     try
                     {
                         double temperature = await _weatherService.GetTemperatureAsync(city.Name);
@@ -93,13 +101,61 @@ namespace First_Project.Controllers
                     {
                         if (ex.InnerException != null)
                         {
-
                             var innerException = ex.InnerException;
                         }
                         return StatusCode(500, $"Error fetching weather data: {ex.Message}");
                     }
-                    _Context.cities.Add(city);
+                    try
+                    {
+                        string cn = await _informationService.GetCitydetailedInformationAsync(cityname);
+                        string lg = await _informationService.GetCityLongitudeAsync(cityname);
+                        string lt = await _informationService.GetCityLatitudeAsync(cityname);
+                        city.CompeleteName = cn;
+                        city.Longitude = lg;
+                        city.Latitude = lt;
+                    }
+                    catch (HttpRequestException ex)
+                    {
+                        if (ex.InnerException != null)
+                        {
+                            var innerException = ex.InnerException;
+                        }
+                        return StatusCode(500, $"Error fetching weather data: {ex.Message}");
+                    }
+                    try
+                    {
+                        long pop = await _icitypopulation.GetCityPopulationAsync(cityname);
+                        string countNm = await _icitypopulation.GetCitycountryNameAsync(cityname);
+                        city.population = pop;
+                        city.country_name = countNm;
 
+                    }
+                    catch (HttpRequestException ex)
+                    {
+                        if (ex.InnerException != null)
+                        {
+                            var innerException = ex.InnerException;
+                        }
+                        return StatusCode(500, $"Error fetching weather data: {ex.Message}");
+                    }
+                    var g = await _Context.Countries.FirstOrDefaultAsync(c => c.Name == city.country_name);
+                    if (g == null)
+                    {
+                        Country country = new Country();
+                        country.Name = city.country_name;
+                        country.Cities = new List<City>();
+                        country.population = 10120;
+                        city.country=country;
+                        _Context.Countries.Add(country);
+                        await _Context.SaveChangesAsync();
+                        g = await _Context.Countries.FirstOrDefaultAsync(c => c.Name == city.country_name);
+                    }
+                   
+                    city.country = g;
+                    city.country_i = g.Id;
+ 
+                    _Context.cities.Add(city);
+                    
                     if (g.Cities != null)
                     {
                         g.Cities.Add(city);
@@ -109,13 +165,14 @@ namespace First_Project.Controllers
                         g.Cities = new List<City>();
                         g.Cities.Add(city);
                     }
-
                     await _Context.SaveChangesAsync();
 
+
                     string modifyTime = $"Last updated Time is {city.modifiedtime}";
-                    string apiResponse = $"Temperature in {city.Name}:{city.tempData}°C";
-                    return Ok(apiResponse + ".\n" + modifyTime);
-                    
+                    string apiResponse = $"Temperature in {city.Name} : {city.tempData}°C";
+                    string moreinfo = $"Latitude  : {city.Latitude},\nLongitude : {city.Longitude} ,\nCompeleteName : {city.CompeleteName},";
+                    string popp = $"countryname  : {city.country_name},\npopulation : {city.population}";
+                    return Ok(apiResponse + ".\n" + modifyTime+".\n" + moreinfo + "\n" + popp);  
                 }
                 DateTime submissionTime = b.modifiedtime;
                 DateTime currentTime = DateTime.Now;
@@ -128,15 +185,21 @@ namespace First_Project.Controllers
                     double temp = Double.Parse(formattedNumber);
                     b.tempData = temp;
                     await _Context.SaveChangesAsync();
-                    string apiResponse = $"Temperature in {b.Name}:{formattedNumber}°C";
+                    string apiResponse = $"Temperature in {b.Name} : {formattedNumber}°C";
                     string modifyTime = $"Last updated Time is {b.modifiedtime}";
-                    return Ok("there it is updated :" + apiResponse + ".\n" + modifyTime);
+                    string moreinfo = $"Latitude : {b.Latitude},\nLongitude : {b.Longitude} ,\nCompeleteName : {b.CompeleteName},";
+                    string popp = $"countryname : {b.country_name},\npopulation : {b.population}";
+                    string update = "there it is updated:";
+                    return Ok(update + "\n" + apiResponse + ".\n" + modifyTime + ".\n" + moreinfo + "\n" + popp);
                 }
                 else
                 {
+                   
                     string modifyTime = $"Last updated Time is {b.modifiedtime}";
-                    string apiResponse = $"Temperature in {b.Name}:{b.tempData}°C";
-                    return Ok(apiResponse + ".\n" + modifyTime);
+                    string apiResponse = $"Temperature in {b.Name} : {b.tempData}°C";
+                    string moreinfo = $"Latitude  : {b.Latitude},\nLongitude : {b.Longitude} ,\nCompeleteName : {b.CompeleteName},";
+                    string popp = $"countryname  : {b.country_name},\npopulation : {b.population}";
+                    return Ok(apiResponse + ".\n" + modifyTime + ".\n" + moreinfo + "\n" + popp);
                 }
             }
             catch (HttpRequestException ex)
@@ -147,32 +210,38 @@ namespace First_Project.Controllers
                 }
                 return StatusCode(500, $"Error fetching weather data: {ex.Message}");  
             }  
-        }
-    
+            /*
+            string result = await _informationService.GetCityInformationAsync(cityname);
+            return Ok(result);*/
 
+            //string p = await _icitypopulation.GetCityPopulationAsync(cityname); 
+            //return Ok(p);   
+         //ouble p = await _areaservice.GetAreaAsync(cityname);   
+         //eturn Ok(p);
+        }
 
         [HttpDelete("DeleteCity")]
-        public async Task<ActionResult<List<City>>> Delete(int id)
-        {
-            var city = await _Context.cities
-        .Include(c => c.country) 
-        .FirstOrDefaultAsync(c => c.Id == id);
-            try
-            {
-                string na = city.Name;
-               
-                if (city.country != null)
-                {
-                    city.country.Cities.Remove(city);
-                }
-                _Context.cities.Remove(city);
-                await _Context.SaveChangesAsync();
-                return NoContent();
-            }
-            catch(Exception e)
-            {
-                return BadRequest("we do not have this city");
-            }
-        }
+         public async Task<ActionResult<List<City>>> Delete(int id)
+         {
+             var city = await _Context.cities
+         .Include(c => c.country) 
+         .FirstOrDefaultAsync(c => c.Id == id);
+             try
+             {
+                 string na = city.Name;
+
+                 if (city.country != null)
+                 {
+                     city.country.Cities.Remove(city);
+                 }
+                 _Context.cities.Remove(city);
+                 await _Context.SaveChangesAsync();
+                 return NoContent();
+             }
+             catch(Exception e)
+             {
+                 return BadRequest("we do not have this city");
+             }
+         } 
     }
 }

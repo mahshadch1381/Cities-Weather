@@ -1,5 +1,6 @@
 using First_Project;
 using First_Project.Data;
+using First_Project.First_Project;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,16 @@ builder.Services.AddDbContext<DataContext>(options =>
 
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IWeatherService, WeatherService>();
+
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<IInformationService, InformationService>();
+
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<ICityPopulationService, CityPopulationService>();
+
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<IAreaService, AreaService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

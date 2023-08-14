@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "uN6GgzoOHxciGHeQcMVb97P0RNXjyvvbMzUpWHDFy1i6K9jIDUcJpIhTAZNDwdgs0rS9Kr/EBuB4qFjOvNFrkg==",
+  "dgSpecHash": "98ORvulTdiKGKiHY9HvrhC005fFfHAlgLlT7WPCqvGniaOIOzXRF7Ev+juuOhV6FSM+fifw/NFYs0MLPzKUvfg==",
   "success": true,
   "projectFilePath": "D:\\projects\\First_Project\\First_Project\\First_Project.csproj",
   "expectedPackageFiles": [
@@ -44,6 +44,7 @@
     "C:\\Users\\Academy 11\\.nuget\\packages\\microsoft.win32.registry\\5.0.0\\microsoft.win32.registry.5.0.0.nupkg.sha512",
     "C:\\Users\\Academy 11\\.nuget\\packages\\microsoft.win32.systemevents\\5.0.0\\microsoft.win32.systemevents.5.0.0.nupkg.sha512",
     "C:\\Users\\Academy 11\\.nuget\\packages\\mono.texttemplating\\2.2.1\\mono.texttemplating.2.2.1.nupkg.sha512",
+    "C:\\Users\\Academy 11\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512",
     "C:\\Users\\Academy 11\\.nuget\\packages\\runtime.native.system.data.sqlclient.sni\\4.7.0\\runtime.native.system.data.sqlclient.sni.4.7.0.nupkg.sha512",
     "C:\\Users\\Academy 11\\.nuget\\packages\\runtime.win-arm64.runtime.native.system.data.sqlclient.sni\\4.4.0\\runtime.win-arm64.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",
     "C:\\Users\\Academy 11\\.nuget\\packages\\runtime.win-x64.runtime.native.system.data.sqlclient.sni\\4.4.0\\runtime.win-x64.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",

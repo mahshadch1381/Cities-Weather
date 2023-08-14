@@ -88,3 +88,4 @@ D:\projects\First_Project\First_Project\obj\Debug\net6.0\refint\First_Project.dl
 D:\projects\First_Project\First_Project\obj\Debug\net6.0\First_Project.pdb
 D:\projects\First_Project\First_Project\obj\Debug\net6.0\First_Project.genruntimeconfig.cache
 D:\projects\First_Project\First_Project\obj\Debug\net6.0\ref\First_Project.dll
+D:\projects\First_Project\First_Project\bin\Debug\net6.0\Newtonsoft.Json.dll

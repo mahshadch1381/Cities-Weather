@@ -22,7 +22,6 @@ namespace First_Project.Controllers
         [HttpGet("GetAllCountries")]
         public async Task<ActionResult<List<CountryDto>>> Get()
         {
-           
               var countryDto = await _Context.Countries
               .Select(c => new CountryDto
               {
@@ -67,7 +66,7 @@ namespace First_Project.Controllers
         }
          [HttpPost("PostCountry")]
           public async Task<ActionResult<List<Country>>> Post(Country country)
-            {
+          {
             var makingCountry = await _Context.Countries.FirstOrDefaultAsync(c => c.Name == country.Name);
             if (makingCountry != null)
             {
@@ -77,7 +76,7 @@ namespace First_Project.Controllers
                 {
                     foreach (var city in country.Cities)
                     {
-                    city.country = country;
+                       city.country = country;
                     }
                 } 
                 _Context.Countries.Add(country);
@@ -89,7 +88,7 @@ namespace First_Project.Controllers
                 };
                 string jsonString = JsonSerializer.Serialize(countries, options);
                 return Ok(jsonString);
-            }
+          }
        
         [HttpDelete("DeleteCountry")]
         public async Task<ActionResult<List<Country>>> Delete(int id)
