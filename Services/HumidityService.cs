@@ -1,13 +1,13 @@
-﻿namespace First_Project
+﻿namespace First_Project.Services
 {
- using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
+    using System.Threading.Tasks;
+    using Newtonsoft.Json.Linq;
 
     public interface IHumidityService
-    { 
-  
-    Task<string> GetCityHumidityAsync(string city);
-           
+    {
+
+        Task<string> GetCityHumidityAsync(string city);
+
     }
     public class HumidityService : IHumidityService
     {
@@ -15,14 +15,14 @@ using Newtonsoft.Json.Linq;
         private readonly string _apiKey;
 
         public HumidityService(HttpClient httpClient)
-        { 
+        {
             _httpClient = httpClient;
             _httpClient.BaseAddress = new Uri("http://api.openweathermap.org/data/2.5/");
             _apiKey = "3bd430ec23ca470e35dc0b05c1f50b47";
         }
 
-         public async Task<string> GetCityHumidityAsync(string city)
-         {
+        public async Task<string> GetCityHumidityAsync(string city)
+        {
             try
             {
                 string url = $"http://api.openweathermap.org/data/2.5/weather?q={Uri.EscapeDataString(city)}&appid={_apiKey}&units=metric";
@@ -47,8 +47,8 @@ using Newtonsoft.Json.Linq;
             }
         }
 
-            
-        }
-    
+
+    }
+
 
 }

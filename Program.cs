@@ -1,6 +1,5 @@
-using First_Project;
 using First_Project.Data;
-
+using First_Project.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

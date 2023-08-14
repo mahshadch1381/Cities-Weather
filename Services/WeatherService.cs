@@ -1,6 +1,6 @@
-﻿namespace First_Project
+﻿namespace First_Project.Services
 {
-    using global::First_Project.relation;
+    using First_Project.relation;
     using System;
     using System.Net.Http;
     using System.Text.Json;
@@ -16,7 +16,7 @@
         private readonly HttpClient _httpClient;
         private readonly string _apiKey;
 
-        public WeatherService(HttpClient httpClient, IConfiguration configuration)      
+        public WeatherService(HttpClient httpClient, IConfiguration configuration)
         {
             _httpClient = httpClient;
             _httpClient.BaseAddress = new Uri("https://api.openweathermap.org/data/2.5/");
@@ -34,7 +34,7 @@
                     WeatherData weatherData = JsonSerializer.Deserialize<WeatherData>(json);
                     if (weatherData != null)
                     {
-                        double temperatureCelsius = weatherData.main.temp - 273.15;     
+                        double temperatureCelsius = weatherData.main.temp - 273.15;
                         return temperatureCelsius;
                     }
                     else

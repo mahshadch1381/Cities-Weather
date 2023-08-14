@@ -1,4 +1,4 @@
-﻿namespace First_Project
+﻿namespace First_Project.Services
 {
     using System.Threading.Tasks;
     using Newtonsoft.Json.Linq;
@@ -22,7 +22,7 @@
         {
             try
             {
-                string username = "mahshadch1381"; // Replace with your GeoNames username
+                string username = "mahshadch1381";
                 string url = $"searchJSON?q={Uri.EscapeDataString(city)}&username={username}";
                 HttpResponseMessage response = await _httpClient.GetAsync(url);
 
@@ -39,7 +39,7 @@
             }
             catch (Exception ex)
             {
-                // Handle exceptions
+
                 return 1;
             }
         }
@@ -48,7 +48,7 @@
         {
             try
             {
-                string username = "mahshadch1381"; // Replace with your GeoNames username
+                string username = "mahshadch1381";
                 string url = $"searchJSON?q={Uri.EscapeDataString(city)}&username={username}";
                 HttpResponseMessage response = await _httpClient.GetAsync(url);
 
@@ -66,7 +66,7 @@
             }
             catch (Exception ex)
             {
-                // Handle exceptions
+
                 return "lp";
             }
         }
