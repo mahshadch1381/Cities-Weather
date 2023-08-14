@@ -15,6 +15,7 @@ namespace First_Project.Models
         public string Latitude { get; set; }
         public string Longitude { get; set; }
         public string CompeleteName { get; set; }
+        public string Humidity { get; set; }
 
         // Data Source=ACADEMY11\SQLEXPRESS;Initial Catalog=Country;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False
     }

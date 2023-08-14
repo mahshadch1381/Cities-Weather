@@ -1,6 +1,6 @@
 ﻿using First_Project.Data;
 using First_Project.DTO;
-using First_Project.First_Project;
+
 using First_Project.Models;
 using Microsoft.AspNetCore.Mvc;
 //using System.Data.Entity;
@@ -20,16 +20,16 @@ namespace First_Project.Controllers
         private readonly IInformationService _informationService;
         private readonly DataContext _Context;
         private readonly ICityPopulationService _icitypopulation;
-        private readonly IAreaService _areaservice;
+        private readonly IHumidityService _huservice;
 
         public CityController(DataContext context, IWeatherService weatherService, IInformationService informationService ,
-            ICityPopulationService cityPopulation , IAreaService areaService)   
+            ICityPopulationService cityPopulation , IHumidityService humidityservice)   
         {
             _Context = context;
             _weatherService = weatherService;
             _informationService = informationService;
             _icitypopulation = cityPopulation;
-            _areaservice = areaService; 
+            _huservice = humidityservice; 
         }
         [HttpGet("GetAllCities")]
         public async Task<ActionResult<List<City>>> GetAllCities()
@@ -46,7 +46,8 @@ namespace First_Project.Controllers
                 tempData = c.tempData,
                 Longitude = c.Longitude,
                 Latitude = c.Latitude,
-                CompeleteName = c.CompeleteName
+                CompeleteName = c.CompeleteName,
+                Humidity = c.Humidity
             })
               .ToListAsync();
             return Ok(cities);
@@ -138,6 +139,19 @@ namespace First_Project.Controllers
                         }
                         return StatusCode(500, $"Error fetching weather data: {ex.Message}");
                     }
+                    try
+                    {
+                        string str = await _huservice.GetCityHumidityAsync(cityname);
+                        city.Humidity = str;    
+                    }
+                    catch (HttpRequestException ex)
+                    {
+                        if (ex.InnerException != null)
+                        {
+                            var innerException = ex.InnerException;
+                        }
+                        return StatusCode(500, $"Error fetching weather data: {ex.Message}");
+                    }
                     var g = await _Context.Countries.FirstOrDefaultAsync(c => c.Name == city.country_name);
                     if (g == null)
                     {
@@ -172,7 +186,8 @@ namespace First_Project.Controllers
                     string apiResponse = $"Temperature in {city.Name} : {city.tempData}°C";
                     string moreinfo = $"Latitude  : {city.Latitude},\nLongitude : {city.Longitude} ,\nCompeleteName : {city.CompeleteName},";
                     string popp = $"countryname  : {city.country_name},\npopulation : {city.population}";
-                    return Ok(apiResponse + ".\n" + modifyTime+".\n" + moreinfo + "\n" + popp);  
+                    string hum = $"Humidity : {city.Humidity}";
+                    return Ok(apiResponse + ".\n" + modifyTime+".\n" + moreinfo + "\n" + popp + "\n" + hum);  
                 }
                 DateTime submissionTime = b.modifiedtime;
                 DateTime currentTime = DateTime.Now;
@@ -183,6 +198,8 @@ namespace First_Project.Controllers
                     b.modifiedtime = DateTime.Now;
                     string formattedNumber = temperature.ToString("0.00");
                     double temp = Double.Parse(formattedNumber);
+                    string str = await _huservice.GetCityHumidityAsync(cityname);
+                    b.Humidity = str;
                     b.tempData = temp;
                     await _Context.SaveChangesAsync();
                     string apiResponse = $"Temperature in {b.Name} : {formattedNumber}°C";
@@ -190,7 +207,8 @@ namespace First_Project.Controllers
                     string moreinfo = $"Latitude : {b.Latitude},\nLongitude : {b.Longitude} ,\nCompeleteName : {b.CompeleteName},";
                     string popp = $"countryname : {b.country_name},\npopulation : {b.population}";
                     string update = "there it is updated:";
-                    return Ok(update + "\n" + apiResponse + ".\n" + modifyTime + ".\n" + moreinfo + "\n" + popp);
+                    string hum =$"Humidity : {b.Humidity}";
+                    return Ok(update + "\n" + apiResponse + ".\n" + modifyTime + ".\n" + moreinfo + "\n" + popp + "\n" + hum);
                 }
                 else
                 {

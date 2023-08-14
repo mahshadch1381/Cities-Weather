@@ -12,5 +12,6 @@
         public string Latitude { get; set; }
         public string Longitude { get; set; }
         public string CompeleteName { get; set; }
+        public string Humidity { get; set; }
     }
 }

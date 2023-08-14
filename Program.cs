@@ -1,6 +1,6 @@
 using First_Project;
 using First_Project.Data;
-using First_Project.First_Project;
+
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,7 +26,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<ICityPopulationService, CityPopulationService>();
 
 builder.Services.AddHttpClient();
-builder.Services.AddScoped<IAreaService, AreaService>();
+builder.Services.AddScoped<IHumidityService, HumidityService>();
 
 var app = builder.Build();
 
