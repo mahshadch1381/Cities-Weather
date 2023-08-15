@@ -41,6 +41,8 @@ namespace First_Project.Controllers
                 return NotFound();
             }
         }
+        // find and return base on id
+
         [HttpGet("GetCountry")]
         public async Task<ActionResult<CountryDto>> Get(int id)
         {
@@ -89,7 +91,7 @@ namespace First_Project.Controllers
                 string jsonString = JsonSerializer.Serialize(countries, options);
                 return Ok(jsonString);
           }
-       
+       // deleting base on id 
         [HttpDelete("DeleteCountry")]
         public async Task<ActionResult<List<Country>>> Delete(int id)
         {

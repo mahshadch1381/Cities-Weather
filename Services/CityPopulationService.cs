@@ -7,6 +7,7 @@
     {
         Task<long> GetCityPopulationAsync(string city);
         Task<string> GetCitycountryNameAsync(string city);
+        Task<(long population, string countryName)> GetCityPopulationAndCountryAsync(string city);
     }
     public class CityPopulationService : ICityPopulationService
     {
@@ -69,6 +70,15 @@
 
                 return "lp";
             }
+        }
+        public async Task<(long population, string countryName)> GetCityPopulationAndCountryAsync(string city)
+        {
+            var populationTask = GetCityPopulationAsync(city);
+            var countryNameTask = GetCitycountryNameAsync(city);
+
+            await Task.WhenAll(populationTask, countryNameTask);
+
+            return (populationTask.Result, countryNameTask.Result);
         }
     }
 }

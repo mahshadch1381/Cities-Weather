@@ -83,9 +83,7 @@ namespace First_Project.Controllers
                     }
                     try
                     {
-                        string cn = await _informationService.GetCitydetailedInformationAsync(cityname);
-                        string lg = await _informationService.GetCityLongitudeAsync(cityname);
-                        string lt = await _informationService.GetCityLatitudeAsync(cityname);
+                        var(cn, lg, lt) = await _informationService.GetCityInformationAsync(cityname);
                         city.CompeleteName = cn;
                         city.Longitude = lg;
                         city.Latitude = lt;
@@ -100,11 +98,9 @@ namespace First_Project.Controllers
                     }
                     try
                     {
-                        long pop = await _icitypopulation.GetCityPopulationAsync(cityname);
-                        string countNm = await _icitypopulation.GetCitycountryNameAsync(cityname);
+                        var(pop, countryNm) = await _icitypopulation.GetCityPopulationAndCountryAsync(cityname);
                         city.population = pop;
-                        city.country_name = countNm;
-
+                        city.country_name = countryNm;
                     }
                     catch (HttpRequestException ex)
                     {
@@ -170,7 +166,7 @@ namespace First_Project.Controllers
                     b.modifiedtime = DateTime.Now;
                     string formattedNumber = temperature.ToString("0.00");
                     double temp = Double.Parse(formattedNumber);
-                    string str = await _huservice.GetCityHumidityAsync(cityname);
+                    string str = await _huservice.GetCityHumidityAsync(b.Name);
                     b.Humidity = str;
                     b.tempData = temp;
                     await _Context.SaveChangesAsync();
@@ -202,7 +198,7 @@ namespace First_Project.Controllers
             }  
             
         }
-        /*
+        
         [HttpDelete("DeleteCity")]
          public async Task<ActionResult<List<City>>> Delete(int id)
          {
@@ -225,6 +221,6 @@ namespace First_Project.Controllers
              {
                  return BadRequest("we do not have this city");
              }
-         } */
+         } 
     }
 }
